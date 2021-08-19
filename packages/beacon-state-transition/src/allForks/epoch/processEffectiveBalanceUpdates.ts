@@ -29,7 +29,13 @@ export function processEffectiveBalanceUpdates(
   const UPWARD_THRESHOLD = HYSTERESIS_INCREMENT * BigInt(HYSTERESIS_UPWARD_MULTIPLIER);
 
   // update effective balances with hysteresis
-  (epochProcess.balances ?? state.balances).forEach((balance: bigint, i: number) => {
+  if (!epochProcess.balances) {
+    // only do this for genesis epoch, or spec test
+    epochProcess.balances = Array.from({length: state.balances.length}, (_, i) => state.balances[i]);
+  }
+  epochProcess.balances.forEach((balanceNbr: number, i: number) => {
+    // TODO: effectiveBalance as number
+    const balance = BigInt(balanceNbr);
     const effectiveBalance = epochProcess.validators[i].effectiveBalance;
     if (
       // Too big

@@ -98,7 +98,7 @@ export interface IEpochProcess {
 
   statuses: IAttesterStatus[];
   validators: phase0.Validator[];
-  balances?: BigUint64Array;
+  balances?: number[];
   // to be used for afterProcessEpoch()
   nextEpochShufflingActiveValidatorIndices: ValidatorIndex[];
 }
