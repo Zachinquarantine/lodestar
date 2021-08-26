@@ -1,8 +1,4 @@
-import {config} from "@chainsafe/lodestar-config/default";
-import {allForks} from "../../../../src";
-import {CachedValidatorList, CachedValidatorListProxyHandler, EpochContext} from "../../../../src/allForks";
 import {phase0, ssz} from "@chainsafe/lodestar-types";
-import {MutableVector} from "@chainsafe/persistent-ts";
 
 let i = 0;
 const heapUsed = process.memoryUsage().heapUsed;
@@ -29,31 +25,4 @@ function getRegistryUpdatesTestData(vc: number): any {
     stateTB.validators.push(validator);
     validatorsFlat.push(validator);
   }
-
-  /////// Create minimal EpochCtx
-  const epochCtx = {
-    exitQueueChurn: 5,
-    exitQueueEpoch: 5,
-    churnLimit: 5,
-    currentShuffling: {epoch: 10},
-  } as EpochContext;
-  ///////
-
-  /////// Recreate minimal CachedBeaconState
-  const validatorCache = MutableVector.from(Array.from(validatorsFlat));
-  const validators = (new Proxy(
-    new CachedValidatorList(
-      ssz.phase0.BeaconState.fields["validators"] as any,
-      ssz.phase0.BeaconState.tree_getProperty(stateTB.tree, "validators") as any,
-      validatorCache
-    ),
-    CachedValidatorListProxyHandler
-  ) as unknown) as allForks.BeaconState["validators"];
-  const state = ({
-    validators,
-    epochCtx,
-    config,
-    finalizedCheckpoint: {epoch: 10},
-  } as unknown) as allForks.CachedBeaconState<allForks.BeaconState>;
-  ///////
 }
