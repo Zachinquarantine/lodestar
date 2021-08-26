@@ -1,11 +1,9 @@
-import {itBench, setBenchOpts} from "@dapplion/benchmark";
-import {config} from "@chainsafe/lodestar-config/default";
-import {allForks} from "../../../../src";
-import {beforeProcessEpoch} from "../../../../src/allForks";
-import {generatePerfTestCachedStatePhase0, numValidators} from "../../util";
-import {StateEpoch} from "../../types";
-import {ssz} from "@chainsafe/lodestar-types";
-
+"use strict";
+exports.__esModule = true;
+var benchmark_1 = require("@dapplion/benchmark");
+var src_1 = require("../../../../src");
+var allForks_1 = require("../../../../src/allForks");
+var util_1 = require("../../util");
 // PERF: Cost 'proportional' to only validators that active + exit. For mainnet conditions:
 // - indicesEligibleForActivationQueue: Maxing deposits triggers 512 validator mutations
 // - indicesEligibleForActivation: 4 per epoch
@@ -16,14 +14,11 @@ import {ssz} from "@chainsafe/lodestar-types";
 //   - indicesEligibleForActivation: ~4000
 //   - indicesEligibleForActivationQueue: 0
 //   - indicesToEject: 0
-
-let i = 0;
-
-describe("phase0 processRegistryUpdates", () => {
-  setBenchOpts({maxMs: 60 * 1000, minRuns: 5});
-
-  const vc = numValidators;
-  const testCases: {id: string; lengths: IndicesLengths}[] = [
+var i = 0;
+describe("phase0 processRegistryUpdates", function () {
+  benchmark_1.setBenchOpts({maxMs: 60 * 1000, minRuns: 5});
+  var vc = util_1.numValidators;
+  var testCases = [
     // Normal (optimal) mainnet network conditions: No effectiveBalance is udpated
     // {
     //   id: "normalcase",
@@ -52,10 +47,8 @@ describe("phase0 processRegistryUpdates", () => {
       },
     },
   ];
-
   // Provide flat `epochProcess.balances` + flat `epochProcess.validators`
   // which will it update validators tree
-
   // for (const {id, lengths} of testCases) {
   //   itBench<StateEpoch, StateEpoch>({
   //     id: `phase0 processRegistryUpdates - ${vc} ${id}`,
@@ -67,69 +60,47 @@ describe("phase0 processRegistryUpdates", () => {
   //     },
   //   });
   // }
-
-  let heapUsed: number;
-
-  for (const {id, lengths} of testCases) {
-    itBench({
-      id: `phase0 processRegistryUpdates - ${vc} ${id}`,
-      before: () => {
+  var heapUsed;
+  var _loop_1 = function (id, lengths) {
+    benchmark_1.itBench({
+      id: "phase0 processRegistryUpdates - " + vc + " " + id,
+      before: function () {
         heapUsed = process.memoryUsage().heapUsed;
       },
-      beforeEach: () => {
-        global.gc();
-      },
-      fn: () => {
-        const {state, epochProcess} = getRegistryUpdatesTestData(vc, lengths);
+      fn: function () {
+        var _a = getRegistryUpdatesTestData(vc, lengths),
+          state = _a.state,
+          epochProcess = _a.epochProcess;
         console.log(i++, (process.memoryUsage().heapUsed - heapUsed) / 1e6, "MB");
-        allForks.processRegistryUpdates(state, epochProcess);
+        src_1.allForks.processRegistryUpdates(state, epochProcess);
         // @ts-ignore
-        // %DebugTrackRetainingPath(state);
+        %DebugTrackRetainingPath(state);
       },
     });
+  };
+  for (var _i = 0, testCases_1 = testCases; _i < testCases_1.length; _i++) {
+    var _a = testCases_1[_i],
+      id = _a.id,
+      lengths = _a.lengths;
+    _loop_1(id, lengths);
   }
 });
-
-type IndicesLengths = {
-  indicesToEject: number;
-  indicesEligibleForActivationQueue: number;
-  indicesEligibleForActivation: number;
-};
-
 /**
  * Create a state that causes `changeRatio` fraction (0,1) of validators to change their effective balance.
  */
-function getRegistryUpdatesTestData(
-  vc: number,
-  lengths: IndicesLengths
-): {
-  state: allForks.CachedBeaconState<allForks.BeaconState>;
-  epochProcess: allForks.IEpochProcess;
-} {
-  const stateTB = ssz.phase0.BeaconState.defaultTreeBacked();
-  stateTB.slot = 1;
-  const validator = ssz.phase0.Validator.defaultValue();
-  validator.exitEpoch = Infinity;
-  validator.withdrawableEpoch = Infinity;
-  for (let i = 0; i < vc; i++) {
-    stateTB.validators.push(validator);
-  }
-  const state = allForks.createCachedBeaconState(config, stateTB, {skipSyncPubkeys: true});
-
-  const epochProcess = beforeProcessEpoch(state);
-
+function getRegistryUpdatesTestData(vc, lengths) {
+  var state = util_1.generatePerfTestCachedStatePhase0({goBackOneSlot: true});
+  var epochProcess = allForks_1.beforeProcessEpoch(state);
   epochProcess.indicesToEject = linspace(lengths.indicesToEject);
   epochProcess.indicesEligibleForActivationQueue = linspace(lengths.indicesEligibleForActivationQueue);
   epochProcess.indicesEligibleForActivation = linspace(lengths.indicesEligibleForActivation);
-
   return {
-    state: state as allForks.CachedBeaconState<allForks.BeaconState>,
-    epochProcess,
+    state: state,
+    epochProcess: epochProcess,
   };
 }
-
-function linspace(count: number): number[] {
-  const arr: number[] = [];
-  for (let i = 0; i < count; i++) arr.push(i);
+function linspace(count) {
+  var arr = [];
+  for (var i_1 = 0; i_1 < count; i_1++) arr.push(i_1);
   return arr;
 }
