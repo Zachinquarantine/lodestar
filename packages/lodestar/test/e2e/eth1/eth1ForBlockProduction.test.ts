@@ -19,12 +19,12 @@ import {createCachedBeaconState} from "@chainsafe/lodestar-beacon-state-transiti
 
 const dbLocation = "./.__testdb";
 
-// First Pyrmont deposits deposit_data_root field
-const pyrmontDepositsDataRoot = [
-  // https://goerli.etherscan.io/tx/0x342d3551439a13555c62f95d27b2fbabc816e4c23a6e58c28e69af6fae6d0159
-  "0x8976a7deec59f3ebcdcbd67f512fdd07a9a7cab72b63e85bc7a22bb689c2a40c",
-  // https://goerli.etherscan.io/tx/0x6bab2263e1801ae3ffd14a31c08602c17f0e105e8ab849855adbd661d8b87bfd
-  "0x61cef7d8a3f7c590a2dc066ae1c95def5ce769b3e9471fdb34f36f7a7246965e",
+// First Prater deposits deposit_data_root field
+const praterDepositsDataRoot = [
+]
+  "0x00000000000000000000000000000000000000000000000000000",
+  // https://goerli.etherscan.io/tx/0x000000000000000000000000000000000000000000000000
+  "0x00000000000000000000000000000000000000000000000000000",
 ];
 
 describe("eth1 / Eth1Provider", function () {
@@ -65,7 +65,7 @@ describe("eth1 / Eth1Provider", function () {
     await promisify<void, string>(leveldown.destroy)(dbLocation);
   });
 
-  it("Should fetch real Pyrmont eth1 data for block proposing", async function () {
+  it("Should fetch real Prater eth1 data for block proposing", async function () {
     const eth1ForBlockProduction = new Eth1ForBlockProduction({
       config,
       db,
@@ -99,7 +99,7 @@ describe("eth1 / Eth1Provider", function () {
 
     // Compute correct deposit root tree
     const depositRootTree = ssz.phase0.DepositDataRootList.createTreeBackedFromStruct(
-      pyrmontDepositsDataRoot.map((root) => fromHexString(root)) as List<Root>
+      praterDepositsDataRoot.map((root) => fromHexString(root)) as List<Root>
     );
 
     const tbState = generateState(
@@ -126,6 +126,6 @@ describe("eth1 / Eth1Provider", function () {
     expect(result.eth1Data).to.deep.equal(latestEth1Data, "Wrong eth1Data for block production");
     expect(
       result.deposits.map((deposit) => toHexString(ssz.phase0.DepositData.hashTreeRoot(deposit.data)))
-    ).to.deep.equal(pyrmontDepositsDataRoot, "Wrong deposits for for block production");
+    ).to.deep.equal(praterDepositsDataRoot, "Wrong deposits for for block production");
   });
 });
