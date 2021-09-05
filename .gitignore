@@ -42,7 +42,6 @@ docs/reference/cli.md
 # Testnet artifacts
 .lodestar
 genesis.ssz
-.pyrmont
 packages/lodestar/.tmpdb/
 
 # Wallet CLI artifacts
