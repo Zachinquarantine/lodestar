@@ -18,7 +18,7 @@ This step is not required, and should only be used to prepare special configurat
       command: "init --network prater",
       description:
         "Initialize a configuration for the Prater testnet. " +
-        `Then, you can edit the config file ${defaultBeaconPathsPyrmont.configFile} to customize your beacon node settings`,
+        `Then, you can edit the config file ${defaultBeaconPathsPrater.configFile} to customize your beacon node settings`,
     },
   ],
   options: beaconOptions as ICliCommandOptions<IBeaconArgs>,
