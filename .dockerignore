@@ -33,7 +33,6 @@ docker-compose.yml
 
 # Lodestar artifacts
 .lodestar
-.pyrmont
 
 # Other / artifacts
 **/.nyc_output
