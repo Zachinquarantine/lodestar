@@ -7,14 +7,13 @@ import {getStateTypeFromBytes} from "@chainsafe/lodestar/lib/util/multifork";
 import {IChainConfig, IChainForkConfig} from "@chainsafe/lodestar-config";
 import {RecursivePartial} from "@chainsafe/lodestar-utils";
 import * as mainnet from "./mainnet";
-import * as pyrmont from "./pyrmont";
 import * as prater from "./prater";
 import * as altairDevnet3 from "./altair-devnet-3";
 
-export type NetworkName = "mainnet" | "pyrmont" | "prater" | "dev" | "altair-devnet-3";
-export const networkNames: NetworkName[] = ["mainnet", "pyrmont", "prater", "altair-devnet-3"];
+export type NetworkName = "mainnet" | "prater" | "dev" | "altair-devnet-3";
+export const networkNames: NetworkName[] = ["mainnet", "prater", "altair-devnet-3"];
 /** Networks that infura supports */
-export const infuraNetworks: NetworkName[] = ["mainnet", "pyrmont", "prater"];
+export const infuraNetworks: NetworkName[] = ["mainnet", "prater"];
 
 function getNetworkData(
   network: NetworkName
@@ -28,8 +27,6 @@ function getNetworkData(
   switch (network) {
     case "mainnet":
       return mainnet;
-    case "pyrmont":
-      return pyrmont;
     case "prater":
       return prater;
     case "altair-devnet-3":
